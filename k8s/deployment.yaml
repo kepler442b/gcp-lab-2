@@ -1,0 +1,41 @@
+---
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  name: "hello-world"
+  namespace: "default"
+  labels:
+    app: "hello-world"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "hello-world"
+  template:
+    metadata:
+      labels:
+        app: "hello-world"
+    spec:
+      containers:
+      - name: "httpd"
+        image: "gcr.io/lab1-273600/httpd@sha256:d7027c9fdd8fc7fd8c3b01de8e28ee45d9f5138875101ab3110bc67c3993d36b"
+---
+apiVersion: "autoscaling/v2beta1"
+kind: "HorizontalPodAutoscaler"
+metadata:
+  name: "hello-world-hpa-99sz"
+  namespace: "default"
+  labels:
+    app: "hello-world"
+spec:
+  scaleTargetRef:
+    kind: "Deployment"
+    name: "hello-world"
+    apiVersion: "apps/v1"
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: "Resource"
+    resource:
+      name: "cpu"
+      targetAverageUtilization: 80
